@@ -1,0 +1,315 @@
+<!--
+
+    Copyright © 2025 VenaNocta (venanocta@gmail.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project-execution-model
+	xmlns="https://api.runeduniverse.net/runes4tools/r4m-pem"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-pem 
+	https://api.runeduniverse.net/runes4tools/r4m-pem-v1_1_0.xsd">
+
+	<modelVersion>1.1.0</modelVersion>
+	<overrides>
+		<disable-super-pom />
+	</overrides>
+	<executions>
+
+		<execution source="plugin" id="default">
+			<triggers>
+				<default />
+			</triggers>
+			<lifecycles>
+				<lifecycle id="help">
+					<phases>
+						<phase id="help">
+							<goals>
+								<goal id="help">
+									<groupId>net.runeduniverse.tools.maven.workflow</groupId>
+									<artifactId>maven-pipeline-workflow</artifactId>
+									<modes>
+										<mode id="default" />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+			</lifecycles>
+		</execution>
+
+		<!-- default-workflow -->
+		<execution source="workflow" id="pipeline">
+			<lifecycles>
+				<lifecycle id="help">
+					<phases>
+						<phase id="help">
+							<goals>
+								<goal id="help">
+									<groupId>net.runeduniverse.tools.maven.workflow</groupId>
+									<artifactId>maven-pipeline-workflow</artifactId>
+									<modes>
+										<mode id="default" />
+									</modes>
+								</goal>
+								<goal id="status">
+									<groupId>net.runeduniverse.tools.maven.r4m</groupId>
+									<artifactId>r4m-maven-extension</artifactId>
+									<modes>
+										<mode id="default" />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+				<lifecycle id="clean">
+					<phases>
+						<phase id="clean">
+							<goals>
+								<goal id="clean">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-clean-plugin</artifactId>
+									<modes>
+										<mode id="default" />
+										<mode id="install" />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+				<lifecycle id="default">
+					<phases>
+						<phase id="validate">
+							<goals>
+								<goal id="toolchain">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-toolchains-plugin</artifactId>
+									<modes>
+										<mode id="default" />
+										<mode id="check" />
+										<mode id="junit-jupiter" />
+									</modes>
+								</goal>
+								<goal id="check" optional="true">
+									<modes>
+										<mode id="check" />
+									</modes>
+									<groupId>com.mycila</groupId>
+									<artifactId>license-maven-plugin</artifactId>
+								</goal>
+								<goal id="validate" optional="true">
+									<modes>
+										<mode id="check" />
+									</modes>
+									<groupId>net.revelc.code.formatter</groupId>
+									<artifactId>formatter-maven-plugin</artifactId>
+								</goal>
+								<goal id="check" optional="true">
+									<groupId>com.diffplug.spotless</groupId>
+									<artifactId>spotless-maven-plugin</artifactId>
+									<modes>
+										<mode id="check" />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="process-resources">
+							<goals>
+								<goal id="resources">
+									<modes>
+										<mode id="install" />
+										<mode id="junit" />
+									</modes>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-resources-plugin</artifactId>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="process-test-resources">
+							<goals>
+								<goal id="testResources">
+									<modes>
+										<mode id="install" />
+										<mode id="junit" />
+									</modes>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-resources-plugin</artifactId>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="install">
+							<goals>
+								<goal id="install">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-install-plugin</artifactId>
+									<modes>
+										<mode id="install" />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="deploy">
+							<!-- deploy phase is entirely covered by Jenkins -->
+						</phase>
+					</phases>
+				</lifecycle>
+				<lifecycle id="site">
+					<phases>
+						<phase id="site">
+							<goals>
+								<goal id="site">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-site-plugin</artifactId>
+									<modes>
+										<mode id="default" />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="site-deploy">
+							<goals>
+								<goal id="deploy">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-site-plugin</artifactId>
+									<modes>
+										<mode id="default" />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+			</lifecycles>
+		</execution>
+
+		<!-- Java -->
+
+		<execution source="workflow" id="pipeline">
+			<restrictions>
+				<packaging-procedure>jar</packaging-procedure>
+			</restrictions>
+			<lifecycles>
+				<lifecycle id="default">
+					<phases>
+						<phase id="compile">
+							<goals>
+								<goal id="compile">
+									<modes>
+										<mode id="install" />
+										<mode id="junit" />
+									</modes>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-compiler-plugin</artifactId>
+								</goal>
+								<goal id="generate-metadata" optional="true">
+									<groupId>org.codehaus.plexus</groupId>
+									<artifactId>plexus-component-metadata</artifactId>
+									<modes>
+										<mode id="install" />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="test-compile">
+							<goals>
+								<goal id="testCompile">
+									<modes>
+										<mode id="junit" />
+										<mode id="install-test" />
+									</modes>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-compiler-plugin</artifactId>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="test">
+							<goals>
+								<goal id="test">
+									<modes>
+										<mode id="junit" />
+									</modes>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-surefire-plugin</artifactId>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+			</lifecycles>
+		</execution>
+
+		<!-- pack as jar -->
+		<execution source="workflow" id="pipeline">
+			<restrictions>
+				<packaging-procedure>jar</packaging-procedure>
+			</restrictions>
+			<lifecycles>
+				<lifecycle id="default">
+					<phases>
+						<phase id="package">
+							<goals>
+								<goal id="jar">
+									<modes>
+										<mode id="install" />
+									</modes>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-jar-plugin</artifactId>
+								</goal>
+								<goal id="test-jar">
+									<modes>
+										<mode id="install-test" />
+									</modes>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-jar-plugin</artifactId>
+								</goal>
+								<goal id="jar-no-fork">
+									<modes>
+										<mode id="install" />
+									</modes>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-source-plugin</artifactId>
+								</goal>
+								<goal id="test-jar-no-fork">
+									<modes>
+										<mode id="install-test" />
+									</modes>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-source-plugin</artifactId>
+								</goal>
+								<goal id="jar">
+									<modes>
+										<mode id="install" />
+									</modes>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-javadoc-plugin</artifactId>
+								</goal>
+								<goal id="test-jar">
+									<modes>
+										<mode id="install-test" />
+									</modes>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-javadoc-plugin</artifactId>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+			</lifecycles>
+		</execution>
+
+	</executions>
+</project-execution-model>
