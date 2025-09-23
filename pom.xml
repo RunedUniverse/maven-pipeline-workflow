@@ -1,0 +1,477 @@
+<!--
+
+    Copyright © 2025 VenaNocta (venanocta@gmail.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>net.runeduniverse.tools.maven.workflow</groupId>
+	<artifactId>maven-pipeline-workflow</artifactId>
+	<version>1.0.0</version>
+	<packaging>maven-plugin</packaging>
+
+	<name>Maven Pipeline Workflow</name>
+	<description>R4M Maven Pipeline Workflow, provides the r4m-metadata for the
+		workflow used in RunedUniverse's CICD pipelines</description>
+	<url>https://github.com/RunedUniverse/maven-pipeline-workflow</url>
+	<inceptionYear>2025</inceptionYear>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java-source-version>1.8</java-source-version>
+		<java-target-version>${java-source-version}</java-target-version>
+		<root-dir>${basedir}</root-dir>
+		<!-- ARTIFACT VERSIONS -->
+		<maven-version-min>3.3.9</maven-version-min>
+		<maven-plugin-api-version>3.8.4</maven-plugin-api-version>
+		<runeduniverse-utils-bom-version>2.0.0</runeduniverse-utils-bom-version>
+		<!-- ARTIFACT VERSIONS - COMPILER -->
+		<maven-plugin-plugin-version>3.15.1</maven-plugin-plugin-version>
+		<plexus-component-version>1.7.1</plexus-component-version>
+		<plugin-maven-clean-version>3.4.1</plugin-maven-clean-version>
+		<plugin-maven-toolchains-version>3.2.0</plugin-maven-toolchains-version>
+		<plugin-maven-resources-version>3.3.1</plugin-maven-resources-version>
+		<plugin-maven-compiler-version>3.14.0</plugin-maven-compiler-version>
+		<plugin-maven-jar-version>3.4.2</plugin-maven-jar-version>
+		<plugin-maven-source-version>3.3.1</plugin-maven-source-version>
+		<plugin-maven-javadoc-version>3.11.2</plugin-maven-javadoc-version>
+		<plugin-maven-install-version>3.1.4</plugin-maven-install-version>
+		<plugin-revelc-formatter-version>2.25.0</plugin-revelc-formatter-version>
+		<plugin-mycila-license-version>4.6</plugin-mycila-license-version>
+		<plugin-maven-dependency-version>3.8.1</plugin-maven-dependency-version>
+	</properties>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>RunedUniverse</name>
+		<url>https://www.runeduniverse.net</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<id>venanocta</id>
+			<name>VenaNocta</name>
+			<email>venanocta@gmail.com</email>
+			<organization>RunedUniverse</organization>
+			<organizationUrl>https://www.runeduniverse.net</organizationUrl>
+			<timezone>Europe/Vienna</timezone>
+			<roles>
+				<role>Maintainer</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<scm>
+		<url>https://github.com/RunedUniverse/maven-pipeline-workflow</url>
+		<connection>
+			scm:git:https://github.com/RunedUniverse/maven-pipeline-workflow.git
+		</connection>
+		<developerConnection>
+			scm:git:git@github.com:RunedUniverse/maven-pipeline-workflow.git
+		</developerConnection>
+	</scm>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/RunedUniverse/maven-pipeline-workflow/issues</url>
+	</issueManagement>
+
+	<prerequisites>
+		<maven>${maven-version-min}</maven>
+	</prerequisites>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-plugin-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.runeduniverse.lib.utils</groupId>
+			<artifactId>utils-maven3</artifactId>
+		</dependency>
+
+		<!-- COMPILER -->
+		<!-- dependency for plexus annotation -->
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-component-annotations</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.apache.maven</groupId>
+				<artifactId>maven-plugin-api</artifactId>
+				<version>${maven-plugin-api-version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>net.runeduniverse.lib.utils</groupId>
+				<artifactId>utils-bom</artifactId>
+				<version>${runeduniverse-utils-bom-version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<!-- COMPILER -->
+			<!-- dependency for plexus annotation -->
+			<dependency>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-component-annotations</artifactId>
+				<version>${plexus-component-version}</version>
+				<scope>provided</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<profiles>
+		<profile>
+			<id>dev-install</id>
+			<repositories>
+				<!-- dev-repo contains: development builds -->
+				<repository>
+					<id>runeduniverse-development</id>
+					<url>
+						https://nexus.runeduniverse.net/repository/maven-development/
+					</url>
+				</repository>
+			</repositories>
+			<build>
+				<defaultGoal>clean formatter:format license:format install</defaultGoal>
+			</build>
+		</profile>
+		<profile>
+			<id>format</id>
+			<build>
+				<defaultGoal>formatter:format license:format</defaultGoal>
+			</build>
+		</profile>
+		<!-- PIPELINE -->
+		<profile>
+			<id>install</id>
+			<build>
+				<defaultGoal>clean install</defaultGoal>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-toolchains-plugin</artifactId>
+						<configuration>
+							<toolchains>
+								<jdk>
+									<version>openjdk-1.8.0</version>
+								</jdk>
+							</toolchains>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+								<configuration>
+									<!-- ignore maven-plugin-plugin annotations -->
+									<doclint>none</doclint>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<!-- REPOSITORIES -->
+		<profile>
+			<id>repo-releases</id>
+			<repositories>
+				<repository>
+					<id>runeduniverse-releases</id>
+					<url>
+						https://nexus.runeduniverse.net/repository/maven-releases/</url>
+				</repository>
+			</repositories>
+		</profile>
+		<profile>
+			<!-- dev-repo contains: build-helper-java & development builds -->
+			<id>repo-development</id>
+			<repositories>
+				<repository>
+					<id>runeduniverse-development</id>
+					<url>
+						https://nexus.runeduniverse.net/repository/maven-development/</url>
+				</repository>
+			</repositories>
+		</profile>
+		<!-- LICENSES -->
+		<profile>
+			<id>validate</id>
+			<build>
+				<defaultGoal>license:check formatter:validate</defaultGoal>
+				<plugins>
+					<plugin>
+						<groupId>com.mycila</groupId>
+						<artifactId>license-maven-plugin</artifactId>
+						<configuration>
+							<dependencyPolicies>
+								<dependencyPolicy>
+									<type>LICENSE_NAME</type>
+									<rule>APPROVE</rule>
+									<value>Apache License, Version 2</value>
+								</dependencyPolicy>
+								<dependencyPolicy>
+									<type>LICENSE_NAME</type>
+									<rule>APPROVE</rule>
+									<value>
+										The Apache Software License, Version 2.0
+									</value>
+								</dependencyPolicy>
+								<dependencyPolicy>
+									<type>LICENSE_URL</type>
+									<rule>APPROVE</rule>
+									<value>
+										http://www.apache.org/licenses/LICENSE-2.0
+									</value>
+								</dependencyPolicy>
+								<dependencyPolicy>
+									<type>LICENSE_URL</type>
+									<rule>APPROVE</rule>
+									<value>
+										https://www.apache.org/licenses/LICENSE-2.0
+									</value>
+								</dependencyPolicy>
+								<dependencyPolicy>
+									<type>LICENSE_URL</type>
+									<rule>APPROVE</rule>
+									<value>
+										http://www.apache.org/licenses/LICENSE-2.0.txt
+									</value>
+								</dependencyPolicy>
+								<dependencyPolicy>
+									<type>LICENSE_URL</type>
+									<rule>APPROVE</rule>
+									<value>
+										https://www.apache.org/licenses/LICENSE-2.0.txt
+									</value>
+								</dependencyPolicy>
+							</dependencyPolicies>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/r4m</directory>
+				<targetPath>META-INF/r4m</targetPath>
+			</resource>
+			<resource>
+				<directory>${basedir}</directory>
+				<targetPath>META-INF</targetPath>
+				<includes>
+					<include>LICENSE</include>
+				</includes>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-toolchains-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>toolchain</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>net.revelc.code.formatter</groupId>
+				<artifactId>formatter-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<!-- don't add groupId here it bricks inherited version -->
+				<artifactId>maven-plugin-plugin</artifactId>
+				<configuration>
+					<goalPrefix>wf-pipeline</goalPrefix>
+					<requiredJavaVersion>${java-target-version}</requiredJavaVersion>
+					<requiredMavenVersion>${maven-version-min}</requiredMavenVersion>
+					<!--
+						========================================================== -->
+					<!-- we have to use the javadoc notation because the           -->
+					<!-- annotations uses static enums, which for example          -->
+					<!-- restrict forking other non-default lifecyles!             -->
+					<!--
+						https://maven.apache.org/plugin-tools/maven-plugin-tools-java/index.html -->
+					<!--
+						========================================================== -->
+					<extractors>
+						<extractor>java-javadoc</extractor>
+					</extractors>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-component-metadata</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate-metadata</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>${plugin-maven-clean-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-toolchains-plugin</artifactId>
+					<version>${plugin-maven-toolchains-version}</version>
+					<configuration>
+						<toolchains>
+							<jdk>
+								<version>openjdk-1.8.0</version>
+							</jdk>
+						</toolchains>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>${plugin-maven-resources-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>net.revelc.code.formatter</groupId>
+					<artifactId>formatter-maven-plugin</artifactId>
+					<version>${plugin-revelc-formatter-version}</version>
+					<configuration>
+						<configFile>
+							${root-dir}/.code-formats/runed-code-format-java.xml
+						</configFile>
+						<lineEnding>LF</lineEnding>
+						<skipHtmlFormatting>true</skipHtmlFormatting>
+						<skipJsFormatting>true</skipJsFormatting>
+						<skipCssFormatting>true</skipCssFormatting>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>com.mycila</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<version>${plugin-mycila-license-version}</version>
+					<configuration>
+						<properties>
+							<year>2025</year>
+							<owner>VenaNocta</owner>
+							<email>venanocta@gmail.com</email>
+						</properties>
+						<mapping>
+							<java>SLASHSTAR_STYLE</java>
+						</mapping>
+						<licenseSets>
+							<licenseSet>
+								<header>${root-dir}/src/license/header.txt</header>
+								<excludes>
+									<exclude>**/.mvn/repo/**</exclude>
+									<exclude>**/license/**</exclude>
+									<exclude>**/target/**</exclude>
+								</excludes>
+							</licenseSet>
+						</licenseSets>
+						<dependencyEnforce>${license-enforce}</dependencyEnforce>
+						<dependencyExceptionMessage>1 or more dependencies got
+							rejected doe to invalid licenses! Contact the
+							Maintainer for a solution!</dependencyExceptionMessage>
+					</configuration>
+				</plugin>
+				<plugin>
+					<!-- don't add groupId here it bricks inherited version -->
+					<artifactId>maven-plugin-plugin</artifactId>
+					<version>${maven-plugin-plugin-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-component-metadata</artifactId>
+					<version>${plexus-component-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${plugin-maven-compiler-version}</version>
+					<configuration>
+						<source>${java-source-version}</source>
+						<target>${java-target-version}</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>${plugin-maven-source-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>${plugin-maven-javadoc-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>${plugin-maven-dependency-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+					<version>${plugin-maven-install-version}</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>
