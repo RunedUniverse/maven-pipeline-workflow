@@ -101,22 +101,23 @@
 									<modes>
 										<mode id="default" />
 										<mode id="check" />
-										<mode id="junit-jupiter" />
+										<mode id="install" />
+										<mode id="test" />
 									</modes>
 								</goal>
 								<goal id="check" optional="true">
-									<modes>
-										<mode id="check" />
-									</modes>
 									<groupId>com.mycila</groupId>
 									<artifactId>license-maven-plugin</artifactId>
-								</goal>
-								<goal id="validate" optional="true">
 									<modes>
 										<mode id="check" />
 									</modes>
+								</goal>
+								<goal id="validate" optional="true">
 									<groupId>net.revelc.code.formatter</groupId>
 									<artifactId>formatter-maven-plugin</artifactId>
+									<modes>
+										<mode id="check" />
+									</modes>
 								</goal>
 								<goal id="check" optional="true">
 									<groupId>com.diffplug.spotless</groupId>
@@ -130,24 +131,24 @@
 						<phase id="process-resources">
 							<goals>
 								<goal id="resources">
-									<modes>
-										<mode id="install" />
-										<mode id="junit" />
-									</modes>
 									<groupId>org.apache.maven.plugins</groupId>
 									<artifactId>maven-resources-plugin</artifactId>
+									<modes>
+										<mode id="install" />
+										<mode id="test" />
+									</modes>
 								</goal>
 							</goals>
 						</phase>
 						<phase id="process-test-resources">
 							<goals>
 								<goal id="testResources">
-									<modes>
-										<mode id="install" />
-										<mode id="junit" />
-									</modes>
 									<groupId>org.apache.maven.plugins</groupId>
 									<artifactId>maven-resources-plugin</artifactId>
+									<modes>
+										<mode id="install" />
+										<mode id="test" />
+									</modes>
 								</goal>
 							</goals>
 						</phase>
@@ -208,12 +209,12 @@
 						<phase id="compile">
 							<goals>
 								<goal id="compile">
-									<modes>
-										<mode id="install" />
-										<mode id="junit" />
-									</modes>
 									<groupId>org.apache.maven.plugins</groupId>
 									<artifactId>maven-compiler-plugin</artifactId>
+									<modes>
+										<mode id="install" />
+										<mode id="test" />
+									</modes>
 								</goal>
 								<goal id="generate-metadata" optional="true">
 									<groupId>org.codehaus.plexus</groupId>
@@ -227,23 +228,23 @@
 						<phase id="test-compile">
 							<goals>
 								<goal id="testCompile">
-									<modes>
-										<mode id="junit" />
-										<mode id="install-test" />
-									</modes>
 									<groupId>org.apache.maven.plugins</groupId>
 									<artifactId>maven-compiler-plugin</artifactId>
+									<modes>
+										<mode id="test" />
+										<mode id="install-test" />
+									</modes>
 								</goal>
 							</goals>
 						</phase>
 						<phase id="test">
 							<goals>
 								<goal id="test">
-									<modes>
-										<mode id="junit" />
-									</modes>
 									<groupId>org.apache.maven.plugins</groupId>
 									<artifactId>maven-surefire-plugin</artifactId>
+									<modes>
+										<mode id="test" />
+									</modes>
 								</goal>
 							</goals>
 						</phase>
@@ -263,46 +264,46 @@
 						<phase id="package">
 							<goals>
 								<goal id="jar">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-jar-plugin</artifactId>
 									<modes>
 										<mode id="install" />
 									</modes>
-									<groupId>org.apache.maven.plugins</groupId>
-									<artifactId>maven-jar-plugin</artifactId>
 								</goal>
 								<goal id="test-jar">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-jar-plugin</artifactId>
 									<modes>
 										<mode id="install-test" />
 									</modes>
-									<groupId>org.apache.maven.plugins</groupId>
-									<artifactId>maven-jar-plugin</artifactId>
 								</goal>
 								<goal id="jar-no-fork">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-source-plugin</artifactId>
 									<modes>
 										<mode id="install" />
 									</modes>
-									<groupId>org.apache.maven.plugins</groupId>
-									<artifactId>maven-source-plugin</artifactId>
 								</goal>
 								<goal id="test-jar-no-fork">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-source-plugin</artifactId>
 									<modes>
 										<mode id="install-test" />
 									</modes>
-									<groupId>org.apache.maven.plugins</groupId>
-									<artifactId>maven-source-plugin</artifactId>
 								</goal>
 								<goal id="jar">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-javadoc-plugin</artifactId>
 									<modes>
 										<mode id="install" />
 									</modes>
-									<groupId>org.apache.maven.plugins</groupId>
-									<artifactId>maven-javadoc-plugin</artifactId>
 								</goal>
 								<goal id="test-jar">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-javadoc-plugin</artifactId>
 									<modes>
 										<mode id="install-test" />
 									</modes>
-									<groupId>org.apache.maven.plugins</groupId>
-									<artifactId>maven-javadoc-plugin</artifactId>
 								</goal>
 							</goals>
 						</phase>

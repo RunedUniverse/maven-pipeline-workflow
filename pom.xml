@@ -22,7 +22,7 @@
 
 	<groupId>net.runeduniverse.tools.maven.workflow</groupId>
 	<artifactId>maven-pipeline-workflow</artifactId>
-	<version>1.0.0</version>
+	<version>0.1.0</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>Maven Pipeline Workflow</name>
