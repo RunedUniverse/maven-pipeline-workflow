@@ -33,13 +33,13 @@
 			<id>rnet-releases-mirror</id>
 			<mirrorOf>runeduniverse-releases</mirrorOf>
 			<name>Local Mirror: rnet-releases</name>
-			<url>${env.MVN_PROXY_rnet-releases_URL}</url>
+			<url>${env.MVN_PROXY_rnet_releases_URL}</url>
 		</mirror>
 		<mirror>
 			<id>rnet-development-mirror</id>
 			<mirrorOf>runeduniverse-development</mirrorOf>
 			<name>Local Mirror: rnet-development</name>
-			<url>${env.MVN_PROXY_rnet-development_URL}</url>
+			<url>${env.MVN_PROXY_rnet_development_URL}</url>
 		</mirror>
 	</mirrors>
 
