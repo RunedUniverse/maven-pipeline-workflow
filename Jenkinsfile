@@ -51,8 +51,6 @@ node( label: 'linux' ) {
 	withModules {
 		tool(name: 'maven-latest', type: 'maven')
 
-		def scm = scmGit( branches: [[name: 'rc-v0.1.0']], userRemoteConfigs: [[credentialsId:  'RunedUniverse-Jenkins',
-				url: 'git@github.com:RunedUniverse/maven-pipeline-workflow.git']])
 		stage('Checkout SCM') {
 			checkout2(scm)
 		}
