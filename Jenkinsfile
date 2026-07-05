@@ -1,6 +1,6 @@
 def evalValue(expression, path = null) {
 	return sh( returnStdout: true,
-		script: "mvn org.apache.maven.plugins:maven-help-plugin:evaluate -Dexpression=${ expression } -q -DforceStdout ${ path==null ? '' : ('-pl='+path) } | tail -1")
+		script: "mvn-dev org.apache.maven.plugins:maven-help-plugin:3.5.1:evaluate -Dexpression=${ expression } -q -DforceStdout ${ path==null ? '' : ('-pl='+path) } | tail -1")
 }
 
 def installArtifact(mod, parent = null) {
@@ -10,9 +10,9 @@ def installArtifact(mod, parent = null) {
 	}
 	def relPath = (parent == null ? null : mod.relPathFrom(parent))
 	// get module metadata
-	def groupId = evalValue('project.groupId', relPath)
-	def artifactId = evalValue('project.artifactId', relPath)
-	def version = evalValue('project.version', relPath)
+	def groupId = mod.metadata().get('maven.groupId');
+	def artifactId = mod.metadata().get('maven.artifactId');
+	def version = mod.metadata().get('maven.version');
 	echo "Building: ${ groupId }:${ artifactId }:${ version }"
 	try {
 		sh "mvn-dev -P ${ REPOS },toolchain-openjdk-1-8-0,ci-install ${ relPath==null ? '' : ('-pl='+relPath) }"
@@ -47,11 +47,14 @@ def installArtifact(mod, parent = null) {
 }
 
 node( label: 'linux' ) {
+	repoProxy(['maven>central': 'central', 'maven>runeduniverse>releases': 'rnet-releases', 'maven>runeduniverse>development': 'rnet-development']) {
 	withModules {
 		tool(name: 'maven-latest', type: 'maven')
 
+		def scm = scmGit( branches: [[name: 'rc-v0.1.0']], userRemoteConfigs: [[credentialsId:  'RunedUniverse-Jenkins',
+				url: 'git@github.com:RunedUniverse/maven-pipeline-workflow.git']])
 		stage('Checkout SCM') {
-			checkout(scm)
+			checkout2(scm)
 		}
 
 		sh 'chmod +x $WORKSPACE/.build/*'
@@ -70,21 +73,20 @@ node( label: 'linux' ) {
 			env.ARCHIVE_PATH = "${ WORKSPACE }/archive/"
 			sh "mkdir -p ${ RESULT_PATH }"
 			sh "mkdir -p ${ ARCHIVE_PATH }"
-			
+
 			addModule( id: 'maven-pipeline-workflow',  path: '.',  name: 'Maven Pipeline Workflow',  tags: [ /*'test',*/ 'pack-jar' ] )
 		}
 
 		stage('Init Modules') {
-			sshagent (credentials: ['RunedUniverse-Jenkins']) {
-				perModule(failFast: true) {
-					def mod = getModule();
-					mod.activate(
-						!mod.hasTag('skip') && sh(
-								returnStdout: true,
-								script: "git-check-version-tag ${ mod.id() } ."
-							) == '1'
-					);
-				}
+			perModule(failFast: true) {
+				def mod = getModule();
+				mod.metadata().put('maven.groupId', evalValue('project.groupId'));
+				mod.metadata().put('maven.artifactId', evalValue('project.artifactId'));
+				def version = evalValue('project.version');
+				mod.metadata().put('maven.version', version);
+				// check skip flag
+				// if not skipped -> check if this version already exists!
+				mod.activate(!mod.hasTag('skip') && !gitTagExists2(scm: scm, tag: "${ mod.id() }/v${ version }"));
 			}
 		}
 		stage ('Info') {
@@ -159,13 +161,10 @@ node( label: 'linux' ) {
 							return
 						}
 						deployArtifacts( bundle: mod.id(), repo: 'nexus-runeduniverse>maven-releases' )
-						def groupId = evalValue('project.groupId')
-						def artifactId = evalValue('project.artifactId')
-						def version = evalValue('project.version')
-						sshagent (credentials: ['RunedUniverse-Jenkins']) {
-							sh "git tag -a ${ mod.id() }/v${ version } -f -m '[artifact] ${ groupId }:${ artifactId }:${ version }'"
-							sh "git push origin ${ mod.id() }/v${ version }"
-						}
+						def groupId = mod.metadata().get('maven.groupId');
+						def artifactId = mod.metadata().get('maven.artifactId');
+						def version = mod.metadata().get('maven.version');
+						gitTagPush2(scm: scm, tag: "${ mod.id() }/v${ version }", comment: "[artifact] ${ groupId }:${ artifactId }:${ version }")
 					}
 					// merge bundles into default
 					bundleMerge( source: mod.id() )
@@ -181,5 +180,6 @@ node( label: 'linux' ) {
 		}
 
 		cleanWs()
-	}
+	}}
 }
+
