@@ -87,6 +87,14 @@
 										<mode id="install" />
 									</modes>
 								</goal>
+								<goal id="clean" optional="true">
+									<groupId>org.codehaus.mojo</groupId>
+									<artifactId>flatten-maven-plugin</artifactId>
+									<modes>
+										<mode id="default" />
+										<mode id="install" />
+									</modes>
+								</goal>
 							</goals>
 						</phase>
 					</phases>
@@ -95,6 +103,15 @@
 					<phases>
 						<phase id="validate">
 							<goals>
+								<goal id="tree" optional="true">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-dependency-plugin</artifactId>
+									<modes>
+										<mode id="default" />
+										<mode id="check" />
+										<mode id="test" />
+									</modes>
+								</goal>
 								<goal id="toolchain">
 									<groupId>org.apache.maven.plugins</groupId>
 									<artifactId>maven-toolchains-plugin</artifactId>
@@ -136,6 +153,13 @@
 									<modes>
 										<mode id="install" />
 										<mode id="test" />
+									</modes>
+								</goal>
+								<goal id="flatten" optional="true">
+									<groupId>org.codehaus.mojo</groupId>
+									<artifactId>flatten-maven-plugin</artifactId>
+									<modes>
+										<mode id="install" />
 									</modes>
 								</goal>
 							</goals>
